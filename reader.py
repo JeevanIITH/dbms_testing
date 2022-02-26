@@ -18,17 +18,21 @@ while counter>0:
         continue
     if line.startswith('#*'):
         title_counter+=1
-        print(line.removeprefix('#*'))
+        print(f"Title: {line.removeprefix('#*')}")
     elif line.startswith('#@'):
-        authors=line.count(',')
-        print(line.removeprefix('#@'))
+        authors+=line.count(',') + 1
+        print(f"Authours are {line.removeprefix('#@')}")
     elif line.startswith('#t'):
-        print(line.removeprefix('#t'))
+        print(f"year : {line.removeprefix('#t')}")
     elif line.startswith('#c'):
-        print(line.removeprefix('#c'))
+        print(f"Paper cited : {line.removeprefix('#c')}")
     elif line.startswith('#index'):
-        print(line.removeprefix('#index'))
+        print(f"ID : {line.removeprefix('#index')}")
         index+=1
+    elif line.startswith('#!'):
+        print(f"Abstract : { line.removeprefix('#!')  }")
+
+print(f"No of lines is {count_} \n index is {index} \n Authors : {authors} \n Title : {title_counter} \n ")
 
 source_file.close()
 output_file.close()
