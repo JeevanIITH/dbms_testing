@@ -3,11 +3,16 @@ from itertools import count
 from turtle import title
 
 
-
+#reads all details of the source file and identifies the category
 def read_all_details():
-    source_file= open('source.txt','r')
-    output_file = open('output.txt','w')
-    counter=3
+    try:
+        source_file= open('source.txt','r')
+        output_file = open('output.txt','w')
+    except:
+        print("Unable to open source.txt")
+        return
+    #This number is just for testing , in practice we will import this from file
+    counter=629814
     title_counter=0
     authors=0
     index=0
@@ -37,14 +42,16 @@ def read_all_details():
     print(f"No of lines is {count_} \n index is {index} \n Authors : {authors} \n Title : {title_counter} \n ")
     source_file.close()
     output_file.close()
-    
+
+
+#Identify, read and return (some authors only upto now ) details of the authors
 def read_authors():
     try:
         source_file= open('source.txt','r',encoding="utf8")
         output_file = open('output.txt','w')
     except:
         print("Unable to open source.txt file")
-    counter=20
+    counter=629814
     authors=0
     Authors=[]
     

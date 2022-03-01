@@ -10,10 +10,10 @@ import psycopg2
 from reader import *
 
 def create_Author_table():
-    """ create a Author table """
+    """ create a Author table if not exist """
     sql_create_table = """CREATE TABLE IF NOT EXISTS Authors ( 
                 Author_ID SERIAL PRIMARY KEY,
-                Author_Name varchar(128) NOT NULL UNIQUE,
+                Author_Name varchar(300) NOT NULL UNIQUE,
                 UNIQUE (Author_Name)
                 )    """
     conn = psycopg2.connect(host = db_host , database = db_name , user = db_user , password = db_pass) 
@@ -23,7 +23,7 @@ def create_Author_table():
     conn.close()  
 
 def Insert_into_Authors(names):
-    """Insert author name into authors table"""
+    """Insert author names (names is a list) into authors table"""
     insert="""INSERT INTO Authors(Author_Name)
                 VALUES(%s)
                 ON CONFLICT (Author_Name) DO NOTHING
@@ -47,10 +47,13 @@ def Insert_into_Authors(names):
     conn.close()
 
 
-
+#create author table
 create_Author_table()
 
+#read authors from source file
 Authors=read_authors()
+
+#insert authors in authors table
 Insert_into_Authors(Authors)
 
 
