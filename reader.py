@@ -77,19 +77,11 @@ def read_authors():
 
 #return a single paper ( Index , Title , Author , abstract) on a call 
 def read_RpAuthors(source_file):
-    """ global flag
-    if flag==False:
-        try:
-            source_file= open('source.txt','r',encoding="utf8")
-            flag=True
-            output_file = open('output.txt','w')
-        except:
-            print("Unable to open source.txt file")
-            return """
     Authors=[]
     line = source_file.readline()
     Author=[]
     abstract=' '
+    paper_cited=[]
     while line !='\n' :
         if line.startswith('#*'):
             #title_counter+=1
@@ -109,10 +101,16 @@ def read_RpAuthors(source_file):
             #print(f"Abstract : { line.removeprefix('#!')  }")
             line = line.removeprefix('#!')
             abstract = line
+        elif line.startswith('#%'):
+            line = line.removeprefix('#%')
+            paper_cited.append(line)
+
         line = source_file.readline()
     if(len(Author)==0):
-        Author=['NULL']
-    return index,Title,Author,abstract
+        Author.append('NULL')
+    if(len(paper_cited)==0):
+        paper_cited.append('NULL')
+    return index,Title,Author,abstract,paper_cited
 
 def file_opener():
     try:
