@@ -136,16 +136,49 @@ def Insert_Rp_Authors(Author_IDs,RP_index):
     except:
         print("Unable to insert data into rp_authors")
 
+def create_co_author():
+    """ create co authors research paper"""
+    sql ="""CREATE TABLE IF NOT EXISTS Rp_coAuthors(
+            index bigint,
+            co_author TEXT,
+            UNIQUE (index,co_author)
+              )"""
+    try:
+        conn = psycopg2.connect(host = db_host , database = db_name , user = db_user , password = db_pass) 
+        cursor = conn.cursor()
+        cursor.execute(sql)
+        conn.commit()
+        conn.close()
+    except:
+        print("Unable to create co_Authors")
+
+def insert_coAuthors(co_authors):
+    """insert coAuthors"""
+    sql="""INSERT INTO  Rp_coAuthors(index,co_author)
+            VALUES(%s,%s)
+            ON CONFLICT(index,co_author) DO NOTHING"""
+    try:
+        conn = psycopg2.connect(host = db_host , database = db_name , user = db_user , password = db_pass) 
+        cursor = conn.cursor()
+        for a in co_authors:
+            for b in a[1]:
+                cursor.execute(sql,(a[0],b,))
+        conn.commit()
+        conn.close()
+    except:
+        print("Unable to insert into co_Authors")
 
 #create author table
-create_Author_table()
+#create_Author_table()
 
 
 #create research paper table
 Create_ResearchPaper_Table() 
 
 #create rp authors relation 
-create_Rp_Authors()
+#create_Rp_Authors()
+
+create_co_author()
 
 
 try:
@@ -164,10 +197,13 @@ for i in range(629814):
     #Insert_rp(index,Title,abstract,Author[0])
     tuple = (index,Title,abstract,Author[0])
     Rp_attributes.append(tuple)
+    co_author_tuple=(index,Author[1:])
+    co_authors.append(co_author_tuple)
 
     
 
 Insert_rp(Rp_attributes)
+insert_coAuthors(co_authors)
 
 source_file.close()
 
