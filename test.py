@@ -153,7 +153,7 @@ try:
 except:
     print("Unable to open source.txt file")
 
-for i in range(11):
+for i in range(629814):
     index,Title,Author,abstract=read_RpAuthors(source_file)
     Insert_rp(index,Title,abstract,Author[0])
     author_ids=Insert_into_Authors(Author)
