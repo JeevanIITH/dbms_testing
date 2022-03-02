@@ -1,12 +1,15 @@
 
 from itertools import count
+from pickle import TRUE
 from turtle import title
+from wsgiref.util import FileWrapper
 
 
+flag=False
 #reads all details of the source file and identifies the category
 def read_all_details():
     try:
-        source_file= open('source.txt','r')
+        source_file= open('source.txt','r',encoding="utf8")
         output_file = open('output.txt','w')
     except:
         print("Unable to open source.txt")
@@ -72,6 +75,52 @@ def read_authors():
     output_file.close()
     return Authors
 
+#return a single paper ( Index , Title , Author , abstract) on a call 
+def read_RpAuthors(source_file):
+    """ global flag
+    if flag==False:
+        try:
+            source_file= open('source.txt','r',encoding="utf8")
+            flag=True
+            output_file = open('output.txt','w')
+        except:
+            print("Unable to open source.txt file")
+            return """
+    Authors=[]
+    line = source_file.readline()
+    Author=[]
+    abstract=' '
+    while line !='\n' :
+        if line.startswith('#*'):
+            #title_counter+=1
+            #print(f"Title: {line.removeprefix('#*')}")
+            line= line.removeprefix('#*')
+            Title=line
+        elif line.startswith('#@'):
+            #authors+=line.count(',') + 1
+            #print(f"Authours are {line.removeprefix('#@')}")
+            line= line.removeprefix('#@')
+            Author=line.split(',')
+        elif line.startswith('#index'):
+            #print(f"ID : {line.removeprefix('#index')}")
+            line = line.removeprefix('#index')
+            index=line
+        elif line.startswith('#!'):
+            #print(f"Abstract : { line.removeprefix('#!')  }")
+            line = line.removeprefix('#!')
+            abstract = line
+        line = source_file.readline()
+    if(len(Author)==0):
+        Author=['NULL']
+    return index,Title,Author,abstract
+
+def file_opener():
+    try:
+        source_file= open('source.txt','r',encoding="utf8")
+        output_file = open('output.txt','w')
+        return source_file
+    except:
+        print("Unable to open source.txt file")       
 
 if __name__=="_main_":
     Authors=read_authors()
