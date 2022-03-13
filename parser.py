@@ -63,13 +63,13 @@ def read_each_paper(source_file):
             year=line
 
         line = source_file.readline()
-
+#----while loop exited
     if(len(paper_cited)==0):
-        paper_cited.append('NULL')
+        paper_cited.append(None)
     if(len(venue)==0):
-        venue='NULL'
+        venue=None
     if(len(Author)==0):
-        Author.append('NULL')
+        Author.append(None)
     return index,Title,Author,abstract,paper_cited,venue,year
 
 def file_opener():
