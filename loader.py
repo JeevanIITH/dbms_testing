@@ -18,25 +18,40 @@ def Create_ResearchPaper_Table():
     sql= """ CREATE TABLE IF NOT EXISTS ResearchPapers(
                 Index bigint PRIMARY KEY,
                 Title TEXT,
-                Main_Author TEXT,
+                Main_Author TEXT default NULL,
                 Abstract TEXT,
-                UNIQUE (Index,Title,Main_Author)
+                UNIQUE(Index,Title)
                 )"""
+    
+    sql1=""" CREATE UNIQUE INDEX uniq  ON ResearchPapers  (Index,Title)
+                WHERE Main_Author IS NULL;
+                 """
     try:
         conn = psycopg2.connect(host = db_host , database = db_name , user = db_user , password = db_pass) 
         cursor = conn.cursor()
         cursor.execute(sql)
+        
         conn.commit()
         conn.close()
     except:
         print("Unable to create research paper table in database")
 
+    try:
+        conn = psycopg2.connect(host = db_host , database = db_name , user = db_user , password = db_pass) 
+        cursor = conn.cursor()
+        cursor.execute(sql1)
+        
+        conn.commit()
+        conn.close()
+    except:
+        print("unique constraint already exist ignoring now")
 
 def Insert_rp(Rp_attributes):
     """Insert data into research paper table """
     sql= """INSERT INTO ResearchPapers(Index,Title,Abstract,Main_Author)
             VALUES(%s,%s,%s,%s) 
-            ON CONFLICT(Index,Title,Main_Author) DO NOTHING """
+            ON CONFLICT(Index,Title) DO NOTHING
+             """
     
     try:
         conn = psycopg2.connect(host = db_host , database = db_name , user = db_user , password = db_pass) 
@@ -97,14 +112,16 @@ def create_paper_cited():
     sql = """CREATE TABLE IF NOT EXISTS paper_cited
             (
                 index bigint,
-                cited_index TEXT,
-                UNIQUE (index,cited_index),
+                cited_index bigint default NULL,
+                UNIQUE(index,cited_index),
                 CONSTRAINT fk_rp
                     FOREIGN KEY(index)
                         REFERENCES ResearchPapers(Index)
 
             )
             """
+    sql1=""" CREATE UNIQUE INDEX unq ON paper_cited (index) WHERE cited_index IS NULL"""
+
     try:
         conn = psycopg2.connect(host = db_host , database = db_name , user = db_user , password = db_pass) 
         cursor = conn.cursor()
@@ -113,18 +130,27 @@ def create_paper_cited():
         conn.close()
     except:
         print("Unable to create paper_cited table")
+    try:
+        conn = psycopg2.connect(host = db_host , database = db_name , user = db_user , password = db_pass) 
+        cursor = conn.cursor()
+        cursor.execute(sql1)
+        conn.commit()
+        conn.close()
+    except:
+        print("ignoring creating constraint")
+
 
 def insert_paper_cited(indexes):
 
     sql = """INSERT INTO paper_cited(index,cited_index)
             VALUES(%s,%s)
-            ON CONFLICT(index,cited_index) DO NOTHING
-            
+            ON CONFLICT (index,cited_index) DO NOTHING
             """
     
     try:
         conn = psycopg2.connect(host = db_host , database = db_name , user = db_user , password = db_pass) 
         cursor = conn.cursor()
+        
         for index in indexes:
             for ind in index[1]:
                 cursor.execute(sql,(index[0],ind,))
@@ -139,7 +165,7 @@ def create_rp_venue():
             (
                 index bigint NOT NULL,
                 venue TEXT REFERENCES Venues(name),
-                year varchar(128) ,
+                year varchar(128) default NULL,
                 UNIQUE (index,venue,year),
 
                 CONSTRAINT fk_index
@@ -191,8 +217,9 @@ def create_authors():
 def insert_authors(Authors):
 
     sql="""INSERT INTO Authors(name)
-            VALUES(%s) 
+            VALUES(%s)  
             ON CONFLICT(name) DO NOTHING"""
+
 
     try:
         conn = psycopg2.connect(host = db_host , database = db_name , user = db_user , password = db_pass) 
@@ -287,9 +314,9 @@ no_papers = int(line)
 for i in range(no_papers):
     index,Title,Author,abstract,paper_cited,venue,year=read_each_paper(source_file)
 
-    if len(Author)!=0:
+    if (Author[0]!=None):
         Authors.append(Author)
-    if len(venue)!=0:
+    if venue!=None:
         Venues.append(venue)
     if (len(index)!=0 and len(Title)!=0):
         #gathering research paper details in list 
@@ -299,16 +326,15 @@ for i in range(no_papers):
             #gathering details of co author in list
             co_author_tuple=(index,Author[1:])
             co_authors.append(co_author_tuple)
-        if (len(paper_cited)!=0):
+        
             #gathering paper cited details in list
             #checks if any paper cited itself
-
-            for p in paper_cited:
-                if index==p:
-                    paper_cited.remove(p)
-            p_cited_tuple=(index,paper_cited)
-            p_cited_attr.append(p_cited_tuple)
-        if(len(venue)!=0):
+        for p in paper_cited:
+            if index==p:
+                paper_cited.remove(p)
+        p_cited_tuple=(index,paper_cited)
+        p_cited_attr.append(p_cited_tuple)
+        if venue:
             venue_tuple = (index,venue,year)
             rp_venue_attr.append(venue_tuple)
             
